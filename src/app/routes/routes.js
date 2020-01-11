@@ -1,3 +1,4 @@
+const LivroDao = require('../infra/livro-dao');
 const db = require('../../config/database');
 
 module.exports = (app) => {
@@ -14,16 +15,14 @@ module.exports = (app) => {
     });
 
     app.get('/livros', function (req, resp) {
-        db.all('SELECT * FROM LIVROS', function(err, result) {
-
-            resp.marko(
-                require('../view/livros/lista/lista.marko'),
-                {
-                    livros: result
-                }
-            );
-        });
+        const livroDao = new LivroDao(db);
+        livroDao.lista()
+                .then(livros => resp.marko(
+                    require('../view/livros/lista/lista.marko'),
+                    {
+                        livros: livros
+                    }
+                )
+                .catch(error => console.log(error)));
     });
-
-
 };
